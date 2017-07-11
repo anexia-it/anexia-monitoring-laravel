@@ -1,7 +1,7 @@
 <?php
 namespace Anexia\Monitoring\Controllers;
 
-use App\Helper\AnexiaMonitoringUpCheckHelper;
+use App\Helpers\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
