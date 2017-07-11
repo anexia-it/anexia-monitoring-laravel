@@ -1,6 +1,7 @@
 <?php
 namespace Anexia\Monitoring\Controllers;
 
+use Anexia\Monitoring\Interfaces\UpMonitoringInterface;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
 use App\Helpers\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
@@ -15,19 +16,8 @@ class UpMonitoringController extends Controller
 {
     use AuthorizationTrait;
 
-    /** string */
-    const DEFAULT_TABLE_TO_CHECK = 'user';
-
-    /** @var string */
-    protected $tableToCheck;
-
     /** @var string[] */
     protected $errors = array();
-
-    public function __construct()
-    {
-        $this->tableToCheck = config('monitoring.table_to_check');
-    }
 
     /**
      * Check the database connection and return 'OK' on success
@@ -53,7 +43,7 @@ class UpMonitoringController extends Controller
     }
 
     /**
-     * Check the db connection and that a select from a table returns results
+     * Check the db connection and process possible customized checks
      *
      * @return bool
      */

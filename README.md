@@ -26,6 +26,15 @@ return [
 ```
 
 
+To add the anexia/laravel-monitoring's config files to the project either run
+```
+php artisan vendor:publish
+```
+
+within your project or manually copy the /vendor/anexia/laravel-monitoring/config/monitoring.php to
+/app/config/monitoring.php .
+
+
 In the projects .env config file add the access token configuration:
 ```
 ANX_MONITORING_ACCESS_TOKEN=custom_monitoring_token
