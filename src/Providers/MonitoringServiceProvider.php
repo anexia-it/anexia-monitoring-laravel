@@ -16,7 +16,10 @@ class MonitoringServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        //
+        // add additional config files
+        $this->publishes([
+            __DIR__ . '/../../config/monitoring.php' => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'monitoring.php',
+        ]);
     }
 
     /**
@@ -30,9 +33,8 @@ class MonitoringServiceProvider extends ServiceProvider
         $this->app->make('Anexia\Monitoring\Controllers\VersionMonitoringController');
         $this->app->make('Anexia\Monitoring\Controllers\UpMonitoringController');
 
-        // add additional config files
-        $this->publishes([
-            __DIR__ . '/../../config/monitoring.php' => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'monitoring.php',
-        ]);
+        $this->mergeConfigFrom(
+            __DIR__ . '/../../config/monitoring.php', 'monitoring'
+        );
     }
 }
