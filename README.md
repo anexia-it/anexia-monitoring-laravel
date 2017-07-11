@@ -1,6 +1,6 @@
 # Anexia Monitoring
 
-A Laravel package used to monitor updates for core, plugins and themes. It can be also used to check if the website
+A Laravel package used to monitor updates for core and composer packages. It can be also used to check if the website
 is alive and working correctly.
 
 ## Installation and configuration
@@ -42,11 +42,49 @@ DB_USERNAME=homestead
 DB_PASSWORD=secret
 ```
 
+### Custom DB Check for UpMonitoring (LiveMonitoring)
 
-In the projects .env config file add the database table to be checked on live (/up) monitoring:
+The anexia/laravel-monitoring only checks the db connection / db availability.
+To add further db validation a customized helper class can be defined. This class must implement the 
+Anexia\Monitoring\UpMonitoringInterface and must be callable via 'App\Helper\AnexiaMonitoringUpCheckHelper'.
+
+Add a new helper class to the project tree as /app/Helper/AnexiaMonitoringUpCheckHelper, e.g.:
 ```
-ANX_MONITORING_TABLE_TO_CHECK=user
+<?php
+namespace App\Helper;
+
+use Anexia\Monitoring\UpMonitoringInterface;
+
+class AnexiaMonitoringUpCheckHelper implements UpMonitoringInterface
+{
+    /**
+     * Check the db according to your requirements
+     *
+     * @return bool
+     */
+    public function checkUpStatus(&$errors = array())
+    {
+        // add db check/validation here
+        /**
+         * e.g.:
+         *
+         * if ($success) {
+         *     return true;
+         * } else {
+         *     $errors[] = 'Database failure: something went wrong!';
+         *     return false;
+         * } 
+         */
+    }
+}
 ```
+
+The customized helper's 'checkUpStatus' method is automatically added to the anexia/laravel-monitoring package's db
+check. If the customized helper's 'checkUpStatus' method returns false and/or adds content to its $error array 
+(given as method parameter by reference), the anexia/laravel-monitoring package's db check will fail. 
+If the customized helper's 'checkUpStatus' method returns false without giving any additional information in the $error
+array (array stays empty), the default error message 'Database failure: custom check was not successful!' will be added
+to the response. 
 
 ## Usage
 
@@ -54,13 +92,11 @@ The package registers some custom REST endpoints which can be used for monitorin
 **ANX_MONITORING_ACCESS_TOKEN** is defined, since this is used for authorization. The endpoints will return a 401
 HTTP_STATUS code if the token is not defined or invalid, and a 200.
 
-#### Version monitoring of core, plugins and themes
+#### Version monitoring of core and composer packages
 
-Returns all a list with platform and module information.
+Returns all a list with platform and composer package information.
 
-**URL:**
-* Active permalinks: `/anxapi/v1/modules/?access_token=custom_access_token`
-* Default: `/?rest_route=/anxapi/v1/modules/&access_token=custom_access_token`
+**URL:** `/anxapi/v1/modules/?access_token=custom_access_token`
 
 Response headers:
 ```
@@ -103,9 +139,7 @@ Response body:
 This endpoint can be used to verify if the application is alive and working correctly. It checks if the database
 connection is working and makes a query for users. It allows to register custom check by using hooks.
 
-**URL:**
-* Active permalinks: `/anxapi/v1/up/?access_token=custom_access_token`
-* Default: `/?rest_route=/anxapi/v1/up/&access_token=custom_access_token`
+**URL:** `/anxapi/v1/up/?access_token=custom_access_token`
 
 Response headers:
 ```
@@ -119,6 +153,37 @@ Content-Type: text/plain
 Response body:
 ```
 OK
+```
+
+
+**Custom DB Check Failure (no custom error message)**
+Response headers (custom check failed without additional error message):
+```
+Status Code: 500 Internal Server Error
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Allow: GET
+Content-Type: text/plain
+```
+
+Response body (containing default error message):
+```
+Database failure: something went wrong!
+```
+
+**Custom DB Check Failure (custom error message)**
+Response headers (custom check failed without additional error message):
+```
+Status Code: 500 Internal Server Error
+Access-Control-Allow-Origin: *
+Access-Control-Allow-Credentials: true
+Allow: GET
+Content-Type: text/plain
+```
+
+Response body (containing custom error message):
+```
+This is an example for a custom db check error message!
 ```
 
 

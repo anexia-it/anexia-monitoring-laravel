@@ -1,12 +1,12 @@
 <?php
-namespace Anexia\Monitoring;
+namespace Anexia\Monitoring\Controllers;
 
 use Composer\Semver\VersionParser;
 use Illuminate\Routing\Controller;
 
 /**
  * Class VersionMonitoringController
- * @package Anexia\Monitoring
+ * @package Anexia\Monitoring\Controllers
  */
 class VersionMonitoringController extends Controller
 {

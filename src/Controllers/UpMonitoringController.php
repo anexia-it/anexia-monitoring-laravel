@@ -1,13 +1,14 @@
 <?php
-namespace Anexia\Monitoring;
+namespace Anexia\Monitoring\Controllers;
 
+use App\Helper\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
  * Class UpMonitoringController
- * @package Anexia\Monitoring
+ * @package Anexia\Monitoring\Controllers
  */
 class UpMonitoringController extends Controller
 {
@@ -64,17 +65,23 @@ class UpMonitoringController extends Controller
             $this->errors[] = 'Database failure: Could not connect to db (error:' . $e->getMessage() . ')';
         }
 
-        // Test database table select
-        try {
-            /** @var Collection $result */
-            $result = DB::table($this->tableToCheck)->get();
+        // hook for custom db checks
+        if (class_exists(AnexiaMonitoringUpCheckHelper::class)) {
+            $customDbCheckHelper = new AnexiaMonitoringUpCheckHelper();
+            if ($customDbCheckHelper instanceof UpMonitoringInterface) {
+                $customErrors = array();
+                $customCheck = $customDbCheckHelper->checkUpStatus($customErrors);
 
-            if (count($result) < 1) {
-                $this->errors[] = 'Database failure: Table "' . $this->tableToCheck . '" is empty';
+                if (!$customCheck || !empty($customErrors)) {
+                    // custom db check failed and/or returned errors
+                    if (empty($customErrors)) {
+                        // default error message, in case custom check failed without adding information to $customErrors
+                        $customErrors[] = 'Database failure: custom check was not successful!';
+                    }
+
+                    $this->errors = array_merge($this->errors, $customErrors);
+                }
             }
-        } catch (\Exception $e) {
-            $this->errors[] = 'Database failure: Could not select from table "' . $this->tableToCheck
-                . '" (error: ' . $e->getMessage() . ')';
         }
 
         if (!empty($this->errors)) {
