@@ -26,13 +26,13 @@ class MonitoringServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        include __DIR__ . '/routes.php';
+        include __DIR__ . '/../routes.php';
         $this->app->make('Anexia\Monitoring\Controllers\VersionMonitoringController');
         $this->app->make('Anexia\Monitoring\Controllers\UpMonitoringController');
 
         // add additional config files
         $this->publishes([
-            __DIR__ . '/../config/monitoring.php' => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'monitoring.php',
+            __DIR__ . '/../../config/monitoring.php' => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'monitoring.php',
         ]);
     }
 }
