@@ -19,7 +19,7 @@ class MonitoringServiceProvider extends ServiceProvider
         // add additional config files
         $this->publishes([
             __DIR__ . '/../../config/monitoring.php' => $this->app['path.config'] . DIRECTORY_SEPARATOR . 'monitoring.php',
-        ]);
+        ], 'anexia-monitoring');
     }
 
     /**
