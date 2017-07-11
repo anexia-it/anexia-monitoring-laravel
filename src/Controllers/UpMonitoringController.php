@@ -1,6 +1,7 @@
 <?php
 namespace Anexia\Monitoring\Controllers;
 
+use Anexia\Monitoring\Traits\AuthorizationTrait;
 use App\Helpers\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Collection;

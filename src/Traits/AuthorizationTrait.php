@@ -1,9 +1,9 @@
 <?php
-namespace Anexia\Monitoring;
+namespace Anexia\Monitoring\Traits;
 
 /**
  * Trait AuthorizationTrait
- * @package Anexia\Monitoring
+ * @package Anexia\Monitoring\Traits
  */
 trait AuthorizationTrait
 {

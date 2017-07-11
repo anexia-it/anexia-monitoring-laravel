@@ -1,11 +1,11 @@
 <?php
-namespace Anexia\Monitoring;
+namespace Anexia\Monitoring\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
 /**
  * Class MonitoringServiceProvider
- * @package Anexia\Monitoring
+ * @package Anexia\Monitoring\Providers
  */
 class MonitoringServiceProvider extends ServiceProvider
 {
@@ -27,8 +27,8 @@ class MonitoringServiceProvider extends ServiceProvider
     public function register()
     {
         include __DIR__ . '/routes.php';
-        $this->app->make('Anexia\Monitoring\VersionMonitoringController');
-        $this->app->make('Anexia\Monitoring\UpMonitoringController');
+        $this->app->make('Anexia\Monitoring\Controllers\VersionMonitoringController');
+        $this->app->make('Anexia\Monitoring\Controllers\UpMonitoringController');
 
         // add additional config files
         $this->publishes([

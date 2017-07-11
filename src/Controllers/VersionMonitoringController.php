@@ -1,6 +1,7 @@
 <?php
 namespace Anexia\Monitoring\Controllers;
 
+use Anexia\Monitoring\Traits\AuthorizationTrait;
 use Composer\Semver\VersionParser;
 use Illuminate\Routing\Controller;
 
