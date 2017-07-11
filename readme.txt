@@ -51,6 +51,36 @@ Install the module via composer, therefore adapt the "require" part of your comp
             "anexia/laravel-monitoring": "1.0"
     },
 
+To automatically publish the composer packages config files to the app, add the scripts to your composer.json:
+    "scripts": {
+        "post-install-cmd": [
+            "php artisan vendor:publish --provider=\"Anexia\\Monitoring\\Providers\\MonitoringServiceProvider\""
+        ],
+        "post-update-cmd": [
+            "php artisan vendor:publish --provider=\"Anexia\\Monitoring\\Providers\\MonitoringServiceProvider\""
+        ]
+    }
+To manually add the anexia/laravel-monitoring's config file instead either run
+    php artisan vendor:publish --provider="Anexia\Monitoring\Providers\MonitoringServiceProvider"
+or manually copy the /vendor/anexia/laravel-monitoring/config/monitoring.php to
+/app/config/monitoring.php after the composer update command.
+
+
+In the projects config/app.php add the new service providers:
+    return [
+        'providers' => [
+            /*
+             * Anexia Monitoring Service Providers...
+             */
+            Anexia\Monitoring\MonitoringServiceProvider::class,
+        ]
+    ];
+
+Now run
+    composer update [-o]
+to add the packages source code to your /vendor directory and its config files to your /config directory.
+
+
 
 In the projects config/app.php add the new service providers:
     return [
