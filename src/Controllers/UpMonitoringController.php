@@ -5,7 +5,6 @@ use Anexia\Monitoring\Interfaces\UpMonitoringInterface;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
 use App\Helpers\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 
 /**
