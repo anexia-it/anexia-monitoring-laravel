@@ -5,14 +5,14 @@ is alive and working correctly.
 
 ## Installation and configuration
 
-Install the module via composer, therefore adapt the "require" part of your composer.json:
+Install the module via composer, therefore adapt the ``require`` part of your ``composer.json``:
 ```
 "require": {
-        "anexia/laravel-monitoring": "1.0"
-    },
+    "anexia/laravel-monitoring": "1.0"
+}
 ```
 
-To automatically publish the composer packages config files to the app, add the scripts to your composer.json:
+To automatically publish the composer packages config files to the app, add the scripts to your ``composer.json``:
 ```
 "scripts": {
     "post-install-cmd": [
@@ -24,24 +24,24 @@ To automatically publish the composer packages config files to the app, add the 
 }
 ```
 
-To manually add the anexia/laravel-monitoring's config file instead either run
+To manually add the config file of ``anexia/laravel-monitoring`` instead either run
 ```
 php artisan vendor:publish --provider="Anexia\Monitoring\Providers\MonitoringServiceProvider"
 ```
 
-sor manually copy the /vendor/anexia/laravel-monitoring/config/monitoring.php to
-/app/config/monitoring.php after the composer update command.
+or manually copy the ``/vendor/anexia/laravel-monitoring/config/monitoring.php`` to
+``/app/config/monitoring.php`` after the composer update command.
 
 
 
-In the projects config/app.php add the new service providers:
+In the projects ``config/app.php`` add the new service providers:
 ```
 return [
     'providers' => [        
         /*
          * Anexia Monitoring Service Providers...
          */
-        Anexia\Monitoring\MonitoringServiceProvider::class,
+        Anexia\Monitoring\Providers\MonitoringServiceProvider::class,
     ]
 ];
 ```
@@ -50,16 +50,16 @@ Now run
 ```
 composer update [-o]
 ```
-to add the packages source code to your /vendor directory and its config files to your /config directory.
+to add the packages source code to your ``/vendor`` directory and its config files to your ``/config`` directory.
 
 
-In the projects .env config file add the access token configuration:
+In the projects ``.env`` config file add the access token configuration:
 ```
 ANX_MONITORING_ACCESS_TOKEN=custom_monitoring_token
 ```
 
 
-In the projects .env config file add the database connection configuration:
+In the projects ``.env`` config file add the database connection configuration:
 ```
 DB_CONNECTION=mysql
 DB_HOST=127.0.0.1
@@ -69,55 +69,11 @@ DB_USERNAME=homestead
 DB_PASSWORD=secret
 ```
 
-### Custom DB Check for UpMonitoring (LiveMonitoring)
-
-The anexia/laravel-monitoring only checks the db connection / db availability.
-To add further db validation a customized helper class can be defined. This class must implement the 
-Anexia\Monitoring\UpMonitoringInterface and must be callable via 'App\Helper\AnexiaMonitoringUpCheckHelper'.
-
-Add a new helper class to the project tree as /app/Helper/AnexiaMonitoringUpCheckHelper, e.g.:
-```
-<?php
-namespace App\Helper;
-
-use Anexia\Monitoring\UpMonitoringInterface;
-
-class AnexiaMonitoringUpCheckHelper implements UpMonitoringInterface
-{
-    /**
-     * Check the db according to your requirements
-     *
-     * @return bool
-     */
-    public function checkUpStatus(&$errors = array())
-    {
-        // add db check/validation here
-        /**
-         * e.g.:
-         *
-         * if ($success) {
-         *     return true;
-         * } else {
-         *     $errors[] = 'Database failure: something went wrong!';
-         *     return false;
-         * } 
-         */
-    }
-}
-```
-
-The customized helper's 'checkUpStatus' method is automatically added to the anexia/laravel-monitoring package's db
-check. If the customized helper's 'checkUpStatus' method returns false and/or adds content to its $error array 
-(given as method parameter by reference), the anexia/laravel-monitoring package's db check will fail. 
-If the customized helper's 'checkUpStatus' method returns false without giving any additional information in the $error
-array (array stays empty), the default error message 'Database failure: custom check was not successful!' will be added
-to the response. 
-
 ## Usage
 
 The package registers some custom REST endpoints which can be used for monitoring. Make sure that the
 **ANX_MONITORING_ACCESS_TOKEN** is defined, since this is used for authorization. The endpoints will return a 401
-HTTP_STATUS code if the token is not defined or invalid, and a 200.
+HTTP_STATUS code if the token is not defined or invalid, or will return a 200 HTTP_STATUS code if everything went well.
 
 #### Version monitoring of core and composer packages
 
@@ -160,11 +116,10 @@ Response body:
 }
 ```
 
-
 #### Live monitoring
 
 This endpoint can be used to verify if the application is alive and working correctly. It checks if the database
-connection is working and makes a query for users. It allows to register custom check by using hooks.
+connection is working. It allows to register custom checks by using hooks.
 
 **URL:** `/anxapi/v1/up/?access_token=custom_access_token`
 
@@ -183,7 +138,8 @@ OK
 ```
 
 
-**Custom DB Check Failure (no custom error message)**
+**Custom up check failure (without custom error message):**
+
 Response headers (custom check failed without additional error message):
 ```
 Status Code: 500 Internal Server Error
@@ -195,10 +151,11 @@ Content-Type: text/plain
 
 Response body (containing default error message):
 ```
-Database failure: something went wrong!
+ERROR
 ```
 
-**Custom DB Check Failure (custom error message)**
+**Custom up check failure (with custom error message):**
+
 Response headers (custom check failed without additional error message):
 ```
 Status Code: 500 Internal Server Error
@@ -213,10 +170,52 @@ Response body (containing custom error message):
 This is an example for a custom db check error message!
 ```
 
+**Custom live monitoring hooks:**
+
+The ``anexia/laravel-monitoring`` only checks the DB connection / DB availability.
+To add further up checks a customized helper class can be defined. This class must implement the 
+``Anexia\Monitoring\Interfaces\UpMonitoringInterface`` and must be available as ``App\Helper\AnexiaMonitoringUpCheckHelper``.
+
+Add a new helper class to the project source code tree as ``/app/Helper/AnexiaMonitoringUpCheckHelper.php``, e.g.:
+```php
+<?php
+namespace App\Helper;
+
+use Anexia\Monitoring\Interfaces\UpMonitoringInterface;
+
+class AnexiaMonitoringUpCheckHelper implements UpMonitoringInterface
+{
+    /**
+     * Check the application according to your needs
+     * @param array $errors
+     * @return bool
+     */
+    public function checkUpStatus(&$errors = array())
+    {
+        // your custom check goes here
+        /**
+         * e.g.:
+         *
+         * if ($success) {
+         *     return true;
+         * } else {
+         *     $errors[] = 'Database failure: something went wrong!';
+         *     return false;
+         * } 
+         */
+    }
+}
+```
+
+The customized helper's ``checkUpStatus`` method gets automatically called by the ``anexia/laravel-monitoring`` 
+package's up check. If the helper's ``checkUpStatus`` method returns ``false`` and/or adds content to its ``$error`` 
+array (given as method parameter by reference), the ``anexia/laravel-monitoring`` package's up check will fail. 
+If the customized helper's ``checkUpStatus`` method returns ``false`` without giving any additional information in the 
+``$error`` array (array stays empty), the default error message ``ERROR`` will be added to the response. 
 
 ## List of developers
 
-* Alexandra Bruckner, Lead developer
+* Alexandra Bruckner <ABruckner@anexia-it.com>, Lead developer
 
 ## Project related external resources
 

@@ -22,27 +22,34 @@ class VersionMonitoringController extends Controller
     {
         if (!$this->checkAccessToken(request())) {
             // no valid access_token given as GET parameter
-            return response()->json([
+            $response = response()->json([
                 'code' => 'Unauthorized',
                 'message' => 'You are not authorized to do this'
             ], 401);
         }
 
-        $laravel = app();
-        $runtime = array(
-            'platform' => 'php',
-            'platform_version' => phpversion(),
-            'framework' => 'laravel',
-            'framework_installed_version' => $laravel::VERSION,
-            'framework_newest_version' => $this->getLatestFrameworkVersion()
-        );
+        else {
+            // all fine
+            $laravel = app();
+            $runtime = [
+                'platform' => 'php',
+                'platform_version' => phpversion(),
+                'framework' => 'laravel',
+                'framework_installed_version' => $laravel::VERSION,
+                'framework_newest_version' => $this->getLatestFrameworkVersion()
+            ];
 
-        $modules = $this->getComposerPackageData();
+            $modules = $this->getComposerPackageData();
 
-        return response()->json([
-            'runtime' => $runtime,
-            'modules' => $modules
-        ]);
+            $response = response()->json([
+                'runtime' => $runtime,
+                'modules' => $modules
+            ]);
+        }
+
+        return $response
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Credentials', 'true');
     }
 
     /**
@@ -62,7 +69,7 @@ class VersionMonitoringController extends Controller
             $packagistInfo = json_decode(file_get_contents($packagistUrl));
             $versions = $packagistInfo->package->versions;
         } catch (\Exception $e) {
-            $versions = array();
+            $versions = [];
         }
 
         if (count($versions) > 0) {
@@ -80,11 +87,6 @@ class VersionMonitoringController extends Controller
             }
         }
 
-        if ($lastVersion === '') {
-            // no stable version number was found on packagist
-            $lastVersion = 'unknown';
-        }
-
         return $lastVersion;
     }
 
@@ -95,7 +97,7 @@ class VersionMonitoringController extends Controller
      */
     private function getComposerPackageData()
     {
-        $moduleVersions = array();
+        $moduleVersions = [];
 
         $installedJsonFile = getcwd() . '/../vendor/composer/installed.json';
         $packages = json_decode(file_get_contents($installedJsonFile));
@@ -115,7 +117,7 @@ class VersionMonitoringController extends Controller
                     $packagistInfo = json_decode(file_get_contents($packagistUrl));
                     $versions = $packagistInfo->package->versions;
                 } catch (\Exception $e) {
-                    $versions = array();
+                    $versions = [];
                 }
 
                 if (count($versions) > 0) {
@@ -133,19 +135,14 @@ class VersionMonitoringController extends Controller
                     }
                 }
 
-                if ($latestStableVersNo === '') {
-                    // no stable version number was found on packagist
-                    $latestStableVersNo = 'unknown';
-                }
-
                 /**
                  * prepare result
                  */
-                $moduleVersions[] = array(
+                $moduleVersions[] = [
                     'name' => $name,
                     'installed_version' => $package->version,
                     'newest_version' => $latestStableVersNo
-                );
+                ];
             }
         }
 

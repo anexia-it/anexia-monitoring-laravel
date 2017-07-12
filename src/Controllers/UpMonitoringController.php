@@ -3,9 +3,9 @@ namespace Anexia\Monitoring\Controllers;
 
 use Anexia\Monitoring\Interfaces\UpMonitoringInterface;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
-use App\Helpers\AnexiaMonitoringUpCheckHelper;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
+use App\Helpers\AnexiaMonitoringUpCheckHelper;
 
 /**
  * Class UpMonitoringController
@@ -16,7 +16,7 @@ class UpMonitoringController extends Controller
     use AuthorizationTrait;
 
     /** @var string[] */
-    protected $errors = array();
+    protected $errors = [];
 
     /**
      * Check the database connection and return 'OK' on success
@@ -27,18 +27,27 @@ class UpMonitoringController extends Controller
     {
         if (!$this->checkAccessToken(request())) {
             // no valid access_token given as GET parameter
-            return response()->json([
+            $response = response()->json([
                 'code' => 'Unauthorized',
                 'message' => 'You are not authorized to do this'
             ], 401);
         }
 
-        if (!$this->checkUpStatus()) {
+        else if (!$this->checkUpStatus()) {
             // up check was not successful
-            return response($this->printErrors(), 500);
+            $response = response($this->printErrors(), 500)
+                ->header('Content-Type', 'text/plain');
         }
 
-        return response('OK');
+        else {
+            // all fine
+            $response = response('OK')
+                ->header('Content-Type', 'text/plain');
+        }
+
+        return $response
+            ->header('Access-Control-Allow-Origin', '*')
+            ->header('Access-Control-Allow-Credentials', 'true');
     }
 
     /**
@@ -55,18 +64,18 @@ class UpMonitoringController extends Controller
             $this->errors[] = 'Database failure: Could not connect to db (error:' . $e->getMessage() . ')';
         }
 
-        // hook for custom db checks
+        // hook for custom checks
         if (class_exists(AnexiaMonitoringUpCheckHelper::class)) {
             $customDbCheckHelper = new AnexiaMonitoringUpCheckHelper();
             if ($customDbCheckHelper instanceof UpMonitoringInterface) {
-                $customErrors = array();
+                $customErrors = [];
                 $customCheck = $customDbCheckHelper->checkUpStatus($customErrors);
 
                 if (!$customCheck || !empty($customErrors)) {
                     // custom db check failed and/or returned errors
                     if (empty($customErrors)) {
                         // default error message, in case custom check failed without adding information to $customErrors
-                        $customErrors[] = 'Database failure: custom check was not successful!';
+                        $customErrors[] = 'ERROR';
                     }
 
                     $this->errors = array_merge($this->errors, $customErrors);
