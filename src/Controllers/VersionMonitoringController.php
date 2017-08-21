@@ -30,12 +30,11 @@ class VersionMonitoringController extends Controller
 
         else {
             // all fine
-            $laravel = app();
             $runtime = [
                 'platform' => 'php',
                 'platform_version' => phpversion(),
                 'framework' => 'laravel',
-                'framework_installed_version' => $laravel::VERSION,
+                'framework_installed_version' => $this->getCurrentFrameworkVersion(),
                 'framework_newest_version' => $this->getLatestFrameworkVersion()
             ];
 
@@ -50,6 +49,23 @@ class VersionMonitoringController extends Controller
         return $response
             ->header('Access-Control-Allow-Origin', '*')
             ->header('Access-Control-Allow-Credentials', 'true');
+    }
+
+    /**
+     * Get version number of the currently installed laravel package
+     *
+     * @return string
+     */
+    private function getCurrentFrameworkVersion()
+    {
+        $laravel = app();
+        $version = (string)$laravel::VERSION;
+
+        if ($version[0] !== 'v') {
+            $version = 'v' . $version;
+        }
+
+        return $version;
     }
 
     /**
