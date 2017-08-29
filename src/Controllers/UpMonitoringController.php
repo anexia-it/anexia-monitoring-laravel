@@ -3,6 +3,7 @@ namespace Anexia\Monitoring\Controllers;
 
 use Anexia\Monitoring\Interfaces\UpMonitoringInterface;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 use Illuminate\Support\Facades\DB;
 use App\Helpers\AnexiaMonitoringUpCheckHelper;
@@ -21,11 +22,12 @@ class UpMonitoringController extends Controller
     /**
      * Check the database connection and return 'OK' on success
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (!$this->checkAccessToken(request())) {
+        if (!$this->checkAccessToken($request)) {
             // no valid access_token given as GET parameter
             $response = response()->json([
                 'code' => 'Unauthorized',

@@ -1,6 +1,8 @@
 <?php
 namespace Anexia\Monitoring\Traits;
 
+use Illuminate\Http\Request;
+
 /**
  * Trait AuthorizationTrait
  * @package Anexia\Monitoring\Traits
@@ -12,7 +14,7 @@ trait AuthorizationTrait
      *
      * @return bool
      */
-    public function checkAccessToken()
+    public function checkAccessToken(Request $request)
     {
         $token = config('monitoring.access_token');
 
@@ -21,7 +23,7 @@ trait AuthorizationTrait
             return false;
         }
 
-        if (request()->get('access_token') !== $token) {
+        if ($request->get('access_token') !== $token) {
             // given token (GET parameter) does not match expected token (config)
             return false;
         }

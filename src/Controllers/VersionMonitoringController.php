@@ -3,6 +3,7 @@ namespace Anexia\Monitoring\Controllers;
 
 use Anexia\ComposerTools\Traits\ComposerPackagistTrait;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
+use Illuminate\Http\Request;
 use Illuminate\Routing\Controller;
 
 /**
@@ -16,11 +17,12 @@ class VersionMonitoringController extends Controller
     /**
      * Retrieve runtime and composer package version information
      *
+     * @param Request $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function index()
+    public function index(Request $request)
     {
-        if (!$this->checkAccessToken(request())) {
+        if (!$this->checkAccessToken($request)) {
             // no valid access_token given as GET parameter
             $response = response()->json([
                 'code' => 'Unauthorized',
