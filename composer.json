@@ -1,12 +1,12 @@
 {
     "name": "anexia/laravel-monitoring",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "license": "MIT",
     "autoload": {
         "psr-4": { "Anexia\\Monitoring\\": "src" }
     },
     "require": {
-        "composer/semver": "~1.4.2"
+        "anexia/composer-tools": "1.0.0"
     },
     "scripts": {
         "post-install-cmd": [

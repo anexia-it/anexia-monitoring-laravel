@@ -98,7 +98,7 @@ Response body:
       "platform_version":"7.0.19",
       "framework":"laravel",
       "framework_installed_version":"5.4.28",
-      "framework_newest_version":"3.0.1"
+      "framework_newest_version":"5.4.28"
    },
    "modules":[
       {

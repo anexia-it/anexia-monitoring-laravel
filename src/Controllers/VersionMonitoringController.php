@@ -1,8 +1,8 @@
 <?php
 namespace Anexia\Monitoring\Controllers;
 
+use Anexia\ComposerTools\Traits\ComposerPackagistTrait;
 use Anexia\Monitoring\Traits\AuthorizationTrait;
-use Composer\Semver\VersionParser;
 use Illuminate\Routing\Controller;
 
 /**
@@ -11,7 +11,7 @@ use Illuminate\Routing\Controller;
  */
 class VersionMonitoringController extends Controller
 {
-    use AuthorizationTrait;
+    use AuthorizationTrait, ComposerPackagistTrait;
 
     /**
      * Retrieve runtime and composer package version information
@@ -35,7 +35,7 @@ class VersionMonitoringController extends Controller
                 'platform_version' => phpversion(),
                 'framework' => 'laravel',
                 'framework_installed_version' => $this->getCurrentFrameworkVersion(),
-                'framework_newest_version' => $this->getLatestFrameworkVersion()
+                'framework_newest_version' => $this->getLatestFrameworkVersion('laravel/framework')
             ];
 
             $modules = $this->getComposerPackageData();
@@ -66,102 +66,5 @@ class VersionMonitoringController extends Controller
         }
 
         return $version;
-    }
-
-    /**
-     * Get latest (stable) version number of composer laravel package (laravel/framework)
-     *
-     * @return string
-     */
-    private function getLatestFrameworkVersion()
-    {
-        $packageName = 'laravel/framework';
-        $lastVersion = '';
-
-        // get version information from packagist
-        $packagistUrl = 'https://packagist.org/packages/' . $packageName . '.json';
-
-        try {
-            $packagistInfo = json_decode(file_get_contents($packagistUrl));
-            $versions = $packagistInfo->package->versions;
-        } catch (\Exception $e) {
-            $versions = [];
-        }
-
-        if (count($versions) > 0) {
-            $latestStableNormVersNo = '';
-            foreach ($versions as $versionData) {
-                $versionNo = $versionData->version;
-                $normVersNo = $versionData->version_normalized;
-                $stability = VersionParser::normalizeStability(VersionParser::parseStability($versionNo));
-
-                // only use stable version numbers
-                if ($stability === 'stable' && version_compare($normVersNo, $latestStableNormVersNo) >= 0) {
-                    $lastVersion = $versionNo;
-                    $latestStableNormVersNo = $normVersNo;
-                }
-            }
-        }
-
-        return $lastVersion;
-    }
-
-    /**
-     * Get information for composer installed packages (currently installed version and latest stable version)
-     *
-     * @return array
-     */
-    private function getComposerPackageData()
-    {
-        $moduleVersions = [];
-
-        $installedJsonFile = getcwd() . '/../vendor/composer/installed.json';
-        $packages = json_decode(file_get_contents($installedJsonFile));
-
-        if (count($packages) > 0) {
-            foreach ($packages as $package) {
-                $name = $package->name;
-                $latestStableVersNo = '';
-
-                /**
-                 * get latest stable version number
-                 */
-                // get version information from packagist
-                $packagistUrl = 'https://packagist.org/packages/' . $name . '.json';
-
-                try {
-                    $packagistInfo = json_decode(file_get_contents($packagistUrl));
-                    $versions = $packagistInfo->package->versions;
-                } catch (\Exception $e) {
-                    $versions = [];
-                }
-
-                if (count($versions) > 0) {
-                    $latestStableNormVersNo = '';
-                    foreach ($versions as $versionData) {
-                        $versionNo = $versionData->version;
-                        $normVersNo = $versionData->version_normalized;
-                        $stability = VersionParser::normalizeStability(VersionParser::parseStability($versionNo));
-
-                        // only use stable version numbers
-                        if ($stability === 'stable' && version_compare($normVersNo, $latestStableNormVersNo) >= 0) {
-                            $latestStableVersNo = $versionNo;
-                            $latestStableNormVersNo = $normVersNo;
-                        }
-                    }
-                }
-
-                /**
-                 * prepare result
-                 */
-                $moduleVersions[] = [
-                    'name' => $name,
-                    'installed_version' => $package->version,
-                    'newest_version' => $latestStableVersNo
-                ];
-            }
-        }
-
-        return $moduleVersions;
     }
 }
