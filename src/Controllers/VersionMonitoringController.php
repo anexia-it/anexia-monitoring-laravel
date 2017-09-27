@@ -37,7 +37,7 @@ class VersionMonitoringController extends Controller
                 'platform_version' => phpversion(),
                 'framework' => 'laravel',
                 'framework_installed_version' => $this->getCurrentFrameworkVersion(),
-                'framework_newest_version' => $this->getLatestFrameworkVersion('laravel/framework')
+                'framework_newest_version' => $this->getLatestPackageVersion('laravel/framework')
             ];
 
             $modules = $this->getComposerPackageData();

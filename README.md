@@ -8,7 +8,7 @@ is alive and working correctly.
 Install the module via composer, therefore adapt the ``require`` part of your ``composer.json``:
 ```
 "require": {
-    "anexia/laravel-monitoring": "1.3.0"
+    "anexia/laravel-monitoring": "1.4.0"
 }
 ```
 
@@ -104,12 +104,24 @@ Response body:
       {
          "name":"package-1",
          "installed_version":"3.1.10",
-         "newest_version":"3.3.2"
+         "installed_version_licences":[
+            "BSD-2-Clause"
+         ],
+         "newest_version":"3.3.2",
+         "newest_version_licences":[
+            "BSD-3-Clause"
+         ]
       },
       {
          "name":"package-2",
          "installed_version":"1.4",
-         "newest_version":"1.4"
+         "installed_version_licences":[
+            "MIT"
+         ],
+         "newest_version":"1.4",
+         "newest_version_licences":[
+            "MIT"
+         ]
       },
       ...
    ]
