@@ -223,7 +223,12 @@ The customized helper's ``checkUpStatus`` method gets automatically called by th
 package's up check. If the helper's ``checkUpStatus`` method returns ``false`` and/or adds content to its ``$error`` 
 array (given as method parameter by reference), the ``anexia/laravel-monitoring`` package's up check will fail. 
 If the customized helper's ``checkUpStatus`` method returns ``false`` without giving any additional information in the 
-``$error`` array (array stays empty), the default error message ``ERROR`` will be added to the response. 
+``$error`` array (array stays empty), the default error message ``ERROR`` will be added to the response.
+
+**Deactivate default DB connection test:**
+
+If you don't want the default DB connection test to happen (because you're on a system where no DB is needed) you can do
+that in the ``/app/config/monitoring.php`` by setting the key ``deactivate_db_check`` to ``true``. 
 
 ## List of developers
 
