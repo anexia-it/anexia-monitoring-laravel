@@ -59,11 +59,14 @@ class UpMonitoringController extends Controller
      */
     private function checkUpStatus()
     {
-        // Test database connection
-        try {
-            DB::connection()->getPdo();
-        } catch (\Exception $e) {
-            $this->errors[] = 'Database failure: Could not connect to db (error:' . $e->getMessage() . ')';
+        // Test database connection (if not disabled)
+        $deactivateDbCheck = config('monitoring.deactivate_db_check');
+        if (!$deactivateDbCheck) {
+            try {
+                DB::connection()->getPdo();
+            } catch (\Exception $e) {
+                $this->errors[] = 'Database failure: Could not connect to db (error:' . $e->getMessage() . ')';
+            }
         }
 
         // hook for custom checks

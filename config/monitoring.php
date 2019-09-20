@@ -14,5 +14,6 @@ return [
     */
 
     'access_token' => env('ANX_MONITORING_ACCESS_TOKEN'),
+    'deactivate_db_check' => false,
 
 ];

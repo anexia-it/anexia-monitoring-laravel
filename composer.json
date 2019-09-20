@@ -1,7 +1,7 @@
 {
     "name": "anexia/laravel-monitoring",
     "description": "A laravel module to monitor runtime (php, laravel) versions, composer package versions and composer package licenses",
-    "version": "1.5.0",
+    "version": "1.5.1",
     "license": "MIT",
     "autoload": {
         "psr-4": { "Anexia\\Monitoring\\": "src" }
