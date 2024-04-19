@@ -1,14 +1,14 @@
 {
     "name": "anexia/laravel-monitoring",
     "description": "A laravel module to monitor runtime (php, laravel) versions, composer package versions and composer package licenses",
-    "version": "1.8.0",
+    "version": "1.8.1",
     "license": "MIT",
     "autoload": {
         "psr-4": { "Anexia\\Monitoring\\": "src" }
     },
     "require": {
-        "anexia/composer-tools": "~1.4.2",
-        "laravel/framework": "^6.0 || ^7.0 || ^8.0 || ^9.0"
+        "anexia/composer-tools": ">=1.4",
+        "laravel/framework": ">=6.0"
     },
     "scripts": {
         "post-install-cmd": [
